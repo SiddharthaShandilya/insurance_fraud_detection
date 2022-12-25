@@ -1,4 +1,4 @@
-![](https://socialify.git.ci/SiddharthaShandilya/Dementia_detection_using_AI/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Dark)
+![](https://socialify.git.ci/SiddharthaShandilya/insurance_fraud_detection/image?description=1&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Dark)
 
 
 
