@@ -141,3 +141,5 @@ configs/secrets.yaml
 
 
 
+*.csv
+*.log
