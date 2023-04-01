@@ -1,4 +1,4 @@
-import json, re, os, shutil, argparse, logging, random
+import json, re, shutil, argparse, logging, random, os
 from tqdm import tqdm
 from src.utils.common import read_yaml, create_directories
 from params import INPUT_FILE_NAME_REGEX
@@ -164,5 +164,39 @@ class Raw_Data_Validation:
             logging.info(e)
             raise e
 
+    def validateMissingValuesInWholeColumn(self):
+        """
+                                  Method Name: validateMissingValuesInWholeColumn
+                                  Description: This function validates if any column in the csv file has all values missing.
+                                               If all the values are missing, the file is not suitable for processing.
+                                               Such files are moved to bad raw data.
+                                  Output: None
+                                  On Failure: Exception
 
+                                   Written By: Siddhartha Shandilya
+                                  Version: 1.0
+                                  Revisions: None
 
+                              """
+        try:
+            logging.info("Missing Values Validation Started!!")
+
+            for file in os.listdir(self.good_data_dir):
+                csv = pd.read_csv(os.path.join(self.good_data_dir, file))
+                count = 0
+                for columns in csv:
+                    if (len(csv[columns]) - csv[columns].count()) == len(csv[columns]):
+                        count+=1
+                        shutil.move(os.path.join(self.good_data_dir, file), self.bad_data_dir)
+                        logging.info(f"Invalid Column for the file!! File moved to {self.bad_data_dir}")
+                        return 0
+                if count==0:
+                    logging.info(f"valid Column for the file!! File moved to {self.good_data_dir}")
+                    csv.to_csv(os.path.join(self.good_data_dir, file), index=None, header=True)
+                    return 1
+        except OSError:
+            logging.info(f"Error Occured while moving the file :: {OSError}")
+            raise OSError
+        except Exception as e:
+            logging.info(-f"Error Occured::{e}")
+            raise e

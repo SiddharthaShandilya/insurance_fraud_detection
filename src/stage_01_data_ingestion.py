@@ -7,6 +7,7 @@ from src.utils.common import read_yaml, create_directories
 import random
 from configs.config import ARTIFACTS, SOURCE_DATA_DIR, VALID_FILE_SCHEMA_PATH
 from src.data_processing.data_validation import Raw_Data_Validation
+from src.data_processing.data_transformation import Raw_Data_Transformation
 
 
 STAGE = "stage_01_data_ingestion" ## <<< change stage name 
@@ -19,11 +20,11 @@ logging.basicConfig(
     )
 
 
-def data_validation(valid_data_schema_path,remote_data_path):
+def dataValidation(valid_data_schema_path,remote_data_path):
     """
         Method Name: valid_data
         Description: This method validates the input data file based on "Schema" file.
-        Output:Bolean -> whether he data file is valid or not
+        Output:Bolean -> whether the data file is valid or not
                                 Written By: Siddhartha Shandilya
         Version: 1.0
         Revisions: None
@@ -38,31 +39,37 @@ def data_validation(valid_data_schema_path,remote_data_path):
         raw_file_name_status = data_validation.raw_file_validation(filename, LengthOfDateStampInFile, LengthOfTimeStampInFile)
         if raw_file_name_status == 1:
             column_length_validaion_status = data_validation.raw_file_column_length_validation(NumberofColumns)
-            if(column_length_validaion_status):
+            if column_length_validaion_status == 1:
                 column_name_validation_status = data_validation.raw_file_column_name_validation(colName=ColName)
-                print(column_name_validation_status)
-         
-    pass
+                if column_name_validation_status == 1:
+                    cloumn_missing_value_status = data_validation.validateMissingValuesInWholeColumn()
+                    if cloumn_missing_value_status == 1:
+                        logging.info(f"Raw Data Validation Completed for {filename}")
+        else:
+            logging.info(f"Raw Data Validation Failed for {filename}")
 
 
+def dataTransformation():
+    data_transformation = Raw_Data_Transformation()
+    logging.info("Raw Data Transformation Started")
+    data_transformation.replaceMissingWithNull()
+    logging.info("!!!Raw Data Transformation Comleted !!!")
 
-def main(config_path, params_path):
+def main():
     ## read config files
-    valid_data_status = data_validation(VALID_FILE_SCHEMA_PATH,SOURCE_DATA_DIR)
-    logging.info(f"getting data validation status : {valid_data_status}")
+    logging.info("Raw Data Validation Started")
+    dataValidation(VALID_FILE_SCHEMA_PATH,SOURCE_DATA_DIR)
+    #Raw Data Transformation Started
+    dataTransformation()
     return 1
 
 
 if __name__ == '__main__':
-    args = argparse.ArgumentParser()
-    args.add_argument("--config", "-c", default="configs/config.py")
-    args.add_argument("--params", "-p", default="params.py")
-    parsed_args = args.parse_args()
-
+    
     try:
         logging.info("\n********************")
         logging.info(f">>>>> stage {STAGE} started <<<<<")
-        main(config_path=parsed_args.config, params_path=parsed_args.params)
+        main()
         logging.info(f">>>>> stage {STAGE} completed!<<<<<\n")
     except Exception as e:
         logging.exception(e)
