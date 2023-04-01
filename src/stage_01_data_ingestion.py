@@ -36,7 +36,7 @@ def data_validation(valid_data_schema_path,remote_data_path):
         # Define a list of validation functions to be executed in sequence
         #here each lambda function wraps each validatin function with the required arguments
         validation_functions = [
-        lambda: data_validation.raw_file_validation(filename, LengthOfDateStampInFile, LengthOfTimeStampInFile),
+        lambda filename=filename: data_validation.raw_file_validation(filename, LengthOfDateStampInFile, LengthOfTimeStampInFile),
         lambda: data_validation.raw_file_column_length_validation(NumberofColumns),
         lambda: data_validation.raw_file_column_name_validation(colName=ColName),
         lambda: data_validation.validate_missing_values_in_whole_column()
