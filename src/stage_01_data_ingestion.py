@@ -1,13 +1,9 @@
 import argparse
 import os
-import shutil
-from tqdm import tqdm
 import logging
-from src.utils.common import read_yaml, create_directories
-import random
 from configs.config import ARTIFACTS, SOURCE_DATA_DIR, VALID_FILE_SCHEMA_PATH
 from src.data_processing.data_validation import Raw_Data_Validation
-from src.data_processing.data_transformation import Raw_Data_Transformation
+from src.data_processing.data_transformation import RawDataTransformation
 
 
 STAGE = "stage_01_data_ingestion" ## <<< change stage name 
@@ -20,7 +16,7 @@ logging.basicConfig(
     )
 
 
-def dataValidation(valid_data_schema_path,remote_data_path):
+def data_validation(valid_data_schema_path,remote_data_path):
     """
         Method Name: valid_data
         Description: This method validates the input data file based on "Schema" file.
@@ -35,32 +31,38 @@ def dataValidation(valid_data_schema_path,remote_data_path):
     logging.info(f"we are getting followign scehma {filename_pattern},{LengthOfDateStampInFile},{LengthOfTimeStampInFile},{NumberofColumns},{ColName}")
     
     onlyfiles = [f for f in os.listdir(remote_data_path)]
+    
     for filename in onlyfiles:
-        raw_file_name_status = data_validation.raw_file_validation(filename, LengthOfDateStampInFile, LengthOfTimeStampInFile)
-        if raw_file_name_status == 1:
-            column_length_validaion_status = data_validation.raw_file_column_length_validation(NumberofColumns)
-            if column_length_validaion_status == 1:
-                column_name_validation_status = data_validation.raw_file_column_name_validation(colName=ColName)
-                if column_name_validation_status == 1:
-                    cloumn_missing_value_status = data_validation.validateMissingValuesInWholeColumn()
-                    if cloumn_missing_value_status == 1:
-                        logging.info(f"Raw Data Validation Completed for {filename}")
+        # Define a list of validation functions to be executed in sequence
+        #here each lambda function wraps each validatin function with the required arguments
+        validation_functions = [
+        lambda filename=filename: data_validation.raw_file_validation(filename, LengthOfDateStampInFile, LengthOfTimeStampInFile),
+        lambda: data_validation.raw_file_column_length_validation(NumberofColumns),
+        lambda: data_validation.raw_file_column_name_validation(colName=ColName),
+        lambda: data_validation.validate_missing_values_in_whole_column()
+        ]
+        # Execute each validation function in the list and store the results in a list
+        validation_results = [func() for func in validation_functions]
+
+        if all(result == 1 for result in validation_results):
+            logging.info(f"Raw Data Validation Completed for {filename}")
         else:
             logging.info(f"Raw Data Validation Failed for {filename}")
 
 
-def dataTransformation():
-    data_transformation = Raw_Data_Transformation()
+
+def data_transformation():
+    data_transformation = RawDataTransformation()
     logging.info("Raw Data Transformation Started")
-    data_transformation.replaceMissingWithNull()
-    logging.info("!!!Raw Data Transformation Comleted !!!")
+    data_transformation.replace_missing_with_null()
+    logging.info("!!!Raw Data Transformation Completed !!!")
 
 def main():
     ## read config files
     logging.info("Raw Data Validation Started")
-    dataValidation(VALID_FILE_SCHEMA_PATH,SOURCE_DATA_DIR)
+    data_validation(VALID_FILE_SCHEMA_PATH,SOURCE_DATA_DIR)
     #Raw Data Transformation Started
-    dataTransformation()
+    data_transformation()
     return 1
 
 

@@ -6,7 +6,7 @@ from configs.config import ARTIFACTS
 import pandas as pd
 
 
-class Raw_Data_Transformation:
+class RawDataTransformation:
 
      """
                This class shall be used for transforming the Good Raw Training Data before loading it in Database!!.
@@ -23,7 +23,7 @@ class Raw_Data_Transformation:
 
 
 
-     def replaceMissingWithNull(self):
+     def replace_missing_with_null(self):
           """
                                            Method Name: replaceMissingWithNull
                                            Description: This method replaces the missing values in columns with "NULL" to
