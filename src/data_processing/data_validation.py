@@ -164,7 +164,7 @@ class Raw_Data_Validation:
             logging.info(e)
             raise e
 
-    def validateMissingValuesInWholeColumn(self):
+    def validate_missing_values_in_whole_column(self):
         """
                                   Method Name: validateMissingValuesInWholeColumn
                                   Description: This function validates if any column in the csv file has all values missing.
