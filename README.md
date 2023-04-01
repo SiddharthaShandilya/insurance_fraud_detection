@@ -161,9 +161,6 @@ docker pull centos104/dementia_detection_web_app
 Below is some screenshot of the web application when it is successfully launched.
 
 
-![web_UI](https://github.com/SiddharthaShandilya/Dementia_detection_using_AI/blob/master/screen_shots/test_web1_front.png)
-![web_UI_backend_output](https://github.com/SiddharthaShandilya/Dementia_detection_using_AI/blob/master/screen_shots/test_web1_back.png)
-
 
 <br></br>
 
