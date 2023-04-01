@@ -198,5 +198,5 @@ class Raw_Data_Validation:
             logging.info(f"Error Occured while moving the file :: {OSError}")
             raise OSError
         except Exception as e:
-            logging.info(-f"Error Occured::{e}")
+            logging.info(f"Error Occured::{e}")
             raise e
