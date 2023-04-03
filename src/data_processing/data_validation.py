@@ -1,12 +1,13 @@
 import json, re, shutil, argparse, logging, random, os
+from datetime import datetime
 from tqdm import tqdm
-from src.utils.common import read_yaml, create_directories
+from src.utils.common import read_yaml, create_directories, delete_directory
 from params import INPUT_FILE_NAME_REGEX
 from configs.config import ARTIFACTS
 import pandas as pd
 
 
-class Raw_Data_Validation:
+class RawDataValidation:
     """
         class Name: Raw_Data_Validation
         Description: This class handles validating the data from source before moveing it to local file storage.
@@ -21,6 +22,7 @@ class Raw_Data_Validation:
         self.valid_data_schema_path=valid_data_schema_path
         self.good_data_dir = os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["DATABASE"],ARTIFACTS["DATABASE_DIR"]["GOOD_DATA_DIR"])
         self.bad_data_dir = os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["DATABASE"],ARTIFACTS["DATABASE_DIR"]["BAD_DATA_DIR"])
+        self.training_archive_bad_data_dir_path = os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["DATABASE"],ARTIFACTS["DATABASE_DIR"]["TRAINING_ARCHIVE_BAD_DATA_DIR"])
 
     def get_value_from_schema(self):
         """
@@ -65,7 +67,7 @@ class Raw_Data_Validation:
     def raw_file_validation(self,input_filename, LengthOfDateStampInFile, LengthOfTimeStampInFile):
         """
             Method Name: raw_file_validation
-            Description: This method validates input filenname with pre-defined "Schema" file.
+            Description: This method validates input filenname with pre-defined "Schema" file. Creates Good and bad Data folder to store the valid docs
             Output:None
             On Failure: Exception
 
@@ -200,3 +202,39 @@ class Raw_Data_Validation:
         except Exception as e:
             logging.info(f"Error Occured::{e}")
             raise e
+    
+
+    def move_bad_files_to_archive_bad(self ):
+
+            """
+                                                Method Name: move_bad_files_to_archive_bad
+                                                Description: This method deletes the directory made  to store the Bad Data
+                                                            after moving the data in an archive folder. We archive the bad
+                                                            files to send them back to the client for invalid data issue.
+                                                Output: None
+                                                On Failure: OSError
+
+                                                Written By: iNeuron Intelligence
+                                                Version: 1.0
+                                                Revisions: None
+
+                                                        """
+            now = datetime.now()
+            date = now.date()
+            time = now.strftime("%H%M%S")
+            try:
+                source = self.bad_data_dir
+                if os.path.isdir(source):
+                    create_directories([ self.training_archive_bad_data_dir_path])
+                    dest =  self.training_archive_bad_data_dir_path +'/BadData_' + str(date)+"_"+str(time)
+                    create_directories([dest])
+                    files = os.listdir(source)
+                    for f in files:
+                        if f not in os.listdir(dest):
+                            shutil.move(source + f, dest)
+                    logging.info("Bad files moved to archive")                
+                    delete_directory(path=self.bad_data_dir)
+                    logging.info("Bad Raw Data Folder Deleted successfully!!")
+            except Exception as e:
+                logging.info("Error while moving bad files to archive:: {e}")
+                raise e
