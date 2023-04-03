@@ -99,18 +99,18 @@ def storing_good_data_to_db_and_delete_dir(col_names, good_data_dir):
         logging.info("Table creation Completed!!")
         logging.info("Insertion of Data into Table started!!!!")
         # insert csv files in the table
-        db_ops.insert_into_table_good_data(Database=database_name)
+        db_ops.insert_into_table_good_data(database=database_name)
         logging.info("Insertion in Table completed!!!")
         delete_directory(good_data_dir)
         logging.info("Good_Data folder deleted!!!")
         logging.debug("Moving bad files to Archive and deleting Bad_Data folder!!!")
         # Move the bad files to archive folder
-        raw_data_validation.move_bad_files_to_ArchiveBad()
+        raw_data_validation.move_bad_files_to_archive_bad()
         logging.info( "Bad files moved to archive!! Bad folder Deleted!!")
         logging.info("Validation Operation completed!!")
         logging.info( "Extracting csv file from table")
         # export data in table to csvfile
-        db_ops.selecting_data_from_table_into_csv(Database=database_name)
+        db_ops.selecting_data_from_table_into_csv(database=database_name)
     except Exception as e:
         logging.info(e)
         raise e

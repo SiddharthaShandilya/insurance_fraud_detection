@@ -20,8 +20,8 @@ class  DbOperations:
     def __init__(self):
         self.database:str = "mydb"
         self.path = os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["SQL_DATABASE_DIR"])
-        self.badFilePath =  os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["DATABASE"],ARTIFACTS["DATABASE_DIR"]["BAD_DATA_DIR"])
-        self.goodFilePath = os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["DATABASE"],ARTIFACTS["DATABASE_DIR"]["GOOD_DATA_DIR"])
+        self.bad_file_path =  os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["DATABASE"],ARTIFACTS["DATABASE_DIR"]["BAD_DATA_DIR"])
+        self.good_file_path = os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["DATABASE"],ARTIFACTS["DATABASE_DIR"]["GOOD_DATA_DIR"])
         self.good_data_raw_table_name = ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_TABLE_NAME"]
 
     def database_connection(self, database: str = None) -> Connection:
@@ -50,7 +50,7 @@ class  DbOperations:
             create_directories([self.path])
             database_path = os.path.join(self.path, database)
             conn = sqlite3.connect(database_path+".db")
-            logging.info(f"Opened %s database successfully : {database}")
+            logging.info(f"Opened : {database} database successfully ")
             return conn
         except ConnectionError:
            logging.info(f"Error while connecting to database: {ConnectionError}")
@@ -82,25 +82,18 @@ class  DbOperations:
             if c.fetchone()[0] ==1:
                 conn.close()               
                 logging.info("Tables created successfully!!")
-                logging.info(f"Closed %s database successfully  {database_name}")
+                logging.info(f"Closed {database_name} database successfully")
             else:
                 for key in column_names.keys():
-                    type = column_names[key]
+                    type_ = column_names[key]
 
                     #in try block we check if the table exists, if yes then add columns to the table
                     # else in catch block we will create the table
                     try:
                         #cur = cur.execute(f"SELECT name FROM {dbName} WHERE type='table' AND name='{self.good_data_raw_table_name}'".format(dbName=database_name))
-                        conn.execute('ALTER TABLE {good_raw_data} ADD COLUMN "{column_name}" {dataType}'.format(good_raw_data=self.good_data_raw_table_name, column_name=key, dataType=type))
+                        conn.execute('ALTER TABLE {good_raw_data} ADD COLUMN "{column_name}" {dataType}'.format(good_raw_data=self.good_data_raw_table_name, column_name=key, dataType=type_))
                     except:
-                        conn.execute('CREATE TABLE  {good_raw_data} ({column_name} {dataType})'.format(good_raw_data=self.good_data_raw_table_name, column_name=key, dataType=type))
-
-                    # try:
-                    #     #cur.execute("SELECT name FROM {dbName} WHERE type='table' AND name='Bad_Raw_Data'".format(dbName=database_name))
-                    #     conn.execute('ALTER TABLE Bad_Raw_Data ADD COLUMN "{column_name}" {dataType}'.format(column_name=key,dataType=type))
-                    #
-                    # except:
-                    #     conn.execute('CREATE TABLE Bad_Raw_Data ({column_name} {dataType})'.format(column_name=key, dataType=type))
+                        conn.execute('CREATE TABLE  {good_raw_data} ({column_name} {dataType})'.format(good_raw_data=self.good_data_raw_table_name, column_name=key, dataType=type_))
 
                 conn.close()
                 logging.info("Tables created successfully!!")
@@ -113,13 +106,13 @@ class  DbOperations:
             raise e
 
 
-    def insert_into_table_good_data(self,Database):
+    def insert_into_table_good_data(self,database):
 
         """
             Inserts the data from the GoodData directory into the Good_Raw_Data table of the given database.
 
             Args:
-                Database (str): Name of the database to connect to.
+                database (str): Name of the database to connect to.
 
             Returns:
                 None
@@ -133,41 +126,42 @@ class  DbOperations:
 
         """
 
-        conn = self.database_connection(database= Database)
-        goodFilePath= self.goodFilePath
-        badFilePath = self.badFilePath
-        onlyfiles = [f for f in os.listdir(goodFilePath)]
+        conn = self.database_connection(database= database)
+        good_file_path= self.good_file_path
+        bad_file_path = self.bad_file_path
+        onlyfiles = [f for f in os.listdir(good_file_path)]
 
         for file in onlyfiles:
             try:
-                with open(goodFilePath+'/'+file, "r") as f:
+                with open(good_file_path+'/'+file, "r") as f:
                     next(f)
                     reader = csv.reader(f, delimiter="\n")
                     for line in enumerate(reader):
                         for list_ in (line[1]):
                             try:
-                                conn.execute('INSERT INTO good_raw_data values ({values})'.format(good_raw_data=self.good_data_raw_table_name,values=(list_)))
+                                conn.execute('INSERT INTO {good_raw_data} values ({values})'.format(good_raw_data=self.good_data_raw_table_name,values=(list_)))
                                 conn.commit()
                             except Exception as e:
+                                logging.error(e)
                                 raise e
                     logging.info(f"{file}: value loaded successfully!!")
 
             except Exception as e:
                 conn.rollback()
                 logging.info(f"Error while creating table: {e}")
-                shutil.move(os.path.join(goodFilePath, file), badFilePath)
+                shutil.move(os.path.join(good_file_path, file), bad_file_path)
                 logging.info(f"File Moved Successfully{file}")
                 conn.close()
 
         conn.close()
 
 
-    def selecting_data_from_table_into_csv(self,Database: str) -> None:
+    def selecting_data_from_table_into_csv(self,database: str) -> None:
         """
             This method exports the data in the GoodData table as a CSV file to a given location.
             
            Args:
-            Database (str) : Name of the database from where data needs to be exported
+            database (str) : Name of the database from where data needs to be exported
                 
             Returns:
                 None
@@ -181,31 +175,31 @@ class  DbOperations:
         """
 
         
-        self.fileFromDb = os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["SQL_DATABASE_DIR"],ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_FILE_DIR"])
-        self.fileName = ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_FILE_NAME"]
-        self.fileFromDb_path = os.path.join(self.fileFromDb, self.fileName)
+        self.file_from_db = os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["SQL_DATABASE_DIR"],ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_FILE_DIR"])
+        self.file_name = ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_FILE_NAME"]
+        self.file_from_db_path = os.path.join(self.file_from_db, self.file_name)
         
         try:
-            conn = self.database_connection(database= Database)
-            sqlSelect = f"SELECT *  FROM {self.good_data_raw_table_name}"
+            conn = self.database_connection(database= database)
+            sql_select = f"SELECT *  FROM {self.good_data_raw_table_name}"
             cursor = conn.cursor()
 
-            cursor.execute(sqlSelect)
+            cursor.execute(sql_select)
 
             results = cursor.fetchall()
             # Get the headers of the csv file
             headers = [i[0] for i in cursor.description]
 
             #Make the CSV ouput directory
-            if not os.path.isdir(self.fileFromDb):
-                os.makedirs(self.fileFromDb)
+            if not os.path.isdir(self.file_from_db):
+                os.makedirs(self.file_from_db)
 
             # Open CSV file for writing.
-            csvFile = csv.writer(open(self.fileFromDb_path, 'w', newline=''),delimiter=',', lineterminator='\r\n',quoting=csv.QUOTE_ALL, escapechar='\\')
+            csv_file = csv.writer(open(self.file_from_db_path, 'w', newline=''),delimiter=',', lineterminator='\r\n',quoting=csv.QUOTE_ALL, escapechar='\\')
 
             # Add the headers and data to the CSV file.
-            csvFile.writerow(headers)
-            csvFile.writerows(results)
+            csv_file.writerow(headers)
+            csv_file.writerows(results)
 
             logging.info("File exported successfully!!!")
 

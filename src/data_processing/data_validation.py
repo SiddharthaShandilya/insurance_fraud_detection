@@ -204,10 +204,10 @@ class RawDataValidation:
             raise e
     
 
-    def move_bad_files_to_ArchiveBad(self ):
+    def move_bad_files_to_archive_bad(self ):
 
             """
-                                                Method Name: move_bad_files_to_ArchiveBad
+                                                Method Name: move_bad_files_to_archive_bad
                                                 Description: This method deletes the directory made  to store the Bad Data
                                                             after moving the data in an archive folder. We archive the bad
                                                             files to send them back to the client for invalid data issue.
