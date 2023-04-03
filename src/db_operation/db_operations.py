@@ -86,13 +86,12 @@ class  DbOperations:
             else:
                 for key in column_names.keys():
                     type_ = column_names[key]
-
                     #in try block we check if the table exists, if yes then add columns to the table
                     # else in catch block we will create the table
                     try:
-                        #cur = cur.execute(f"SELECT name FROM {dbName} WHERE type='table' AND name='{self.good_data_raw_table_name}'".format(dbName=database_name))
                         conn.execute('ALTER TABLE {good_raw_data} ADD COLUMN "{column_name}" {dataType}'.format(good_raw_data=self.good_data_raw_table_name, column_name=key, dataType=type_))
-                    except:
+                    except Exception as e:
+                        logging.info(e)
                         conn.execute('CREATE TABLE  {good_raw_data} ({column_name} {dataType})'.format(good_raw_data=self.good_data_raw_table_name, column_name=key, dataType=type_))
 
                 conn.close()
