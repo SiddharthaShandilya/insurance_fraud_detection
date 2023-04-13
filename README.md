@@ -32,6 +32,7 @@ The project is about creating a model which predicts whether presnt insurance is
 - [Uninstallation](#uninstallation)
 - [Contributing](#contributing)
 - [Future Scope](#future-scope)
+- [About Author](#about-author)
 
 
 </br></br>
@@ -192,5 +193,8 @@ Your contributions are always welcome! Please have a look at the [contribution g
 
 we are currently working on the UI part as well as trying to make section in the web-app to upload a MRI scan to locate demtia. Feel free to improve the code or share some innovative ideas.
 
+# About Author
+[(Back to top)](#table-of-contents)
 
+Siddhartha Shandilya
 
