@@ -7,5 +7,6 @@ PyYAML
 scikit-learn
 flask
 shutils
+black # for simple code formatting
 ### local packages -
 # -e . # << uncomment this to install from setup.py

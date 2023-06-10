@@ -6,6 +6,7 @@ import pandas as pd
 import json
 import shutil
 
+
 def read_yaml(path_to_yaml: str) -> dict:
     """
     Reads Yaml at the given path.
@@ -19,6 +20,7 @@ def read_yaml(path_to_yaml: str) -> dict:
         content = yaml.safe_load(yaml_file)
     logging.info(f"yaml file: {path_to_yaml} loaded successfully")
     return content
+
 
 def create_directories(path_to_directories: list) -> None:
     """
