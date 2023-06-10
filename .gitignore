@@ -144,3 +144,6 @@ configs/secrets.yaml
 *.csv
 *.log
 logs/*
+   
+# ignoring any local DB create using sqlite
+*.db 

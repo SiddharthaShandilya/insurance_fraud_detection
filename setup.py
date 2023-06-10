@@ -22,5 +22,5 @@ setup(
     packages=[SRC_REPO],
     license="MIT",
     python_requires=">=3.6",
-    install_requires=LIST_OF_REQUIREMENTS
+    install_requires=LIST_OF_REQUIREMENTS,
 )
