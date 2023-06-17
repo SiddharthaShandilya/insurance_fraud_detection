@@ -92,14 +92,11 @@ class DbOperations:
         Revisions: None
         """
         try:
-            logging.info("create_table_db is called ")
-            conn = self.database_connection(database=database_name)
-            c = conn.cursor()
-            c.execute(
-                f"SELECT count(name)  FROM sqlite_master WHERE type = 'table'AND name = '{self.good_data_raw_table_name}'"
-            )
-            if c.fetchone()[0] == 1:
-                conn.close()
+            conn = self.database_connection( database= database_name)
+            c=conn.cursor()
+            c.execute(f"SELECT count(name)  FROM sqlite_master WHERE type = 'table'AND name = '{self.good_data_raw_table_name}'")
+            if c.fetchone()[0] ==1:
+                conn.close()               
                 logging.info("Tables created successfully!!")
                 logging.info(f"Closed {database_name} database successfully")
             else:
@@ -205,12 +202,9 @@ class DbOperations:
          Version: 1.0
          Revisions: None
         """
-        logging.info("selecting_data_from_table_into_csv function is called")
-        self.file_from_db = os.path.join(
-            ARTIFACTS["ARTIFACTS_DIR"],
-            ARTIFACTS["DATABASE_DIR"]["SQL_DATABASE_DIR"],
-            ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_FILE_DIR"],
-        )
+
+        
+        self.file_from_db = os.path.join(ARTIFACTS["ARTIFACTS_DIR"],ARTIFACTS["DATABASE_DIR"]["SQL_DATABASE_DIR"],ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_FILE_DIR"])
         self.file_name = ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_FILE_NAME"]
         self.file_from_db_path = os.path.join(self.file_from_db, self.file_name)
 
