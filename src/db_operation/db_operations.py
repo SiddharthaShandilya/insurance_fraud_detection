@@ -57,6 +57,7 @@ class DbOperations:
          Revisions: None
         """
         conn = None
+        logging.info(" database_connection function is called")
         try:
             if database is None:
                 database = self.database
@@ -91,6 +92,7 @@ class DbOperations:
         Revisions: None
         """
         try:
+            logging.info("create_table_db is called ")
             conn = self.database_connection(database=database_name)
             c = conn.cursor()
             c.execute(
@@ -151,7 +153,7 @@ class DbOperations:
         Revisions: None
 
         """
-
+        logging.info("insert_into_table_good_data function is called")
         conn = self.database_connection(database=database)
         good_file_path = self.good_file_path
         bad_file_path = self.bad_file_path
@@ -203,7 +205,7 @@ class DbOperations:
          Version: 1.0
          Revisions: None
         """
-
+        logging.info("selecting_data_from_table_into_csv function is called")
         self.file_from_db = os.path.join(
             ARTIFACTS["ARTIFACTS_DIR"],
             ARTIFACTS["DATABASE_DIR"]["SQL_DATABASE_DIR"],
