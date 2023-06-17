@@ -8,5 +8,6 @@ scikit-learn
 flask
 shutils
 black # for simple code formatting
+sklearn-pandas
 ### local packages -
-# -e . # << uncomment this to install from setup.py
+-e . # << uncomment this to install from setup.py
