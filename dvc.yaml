@@ -1,0 +1,27 @@
+stages:
+  DATA_INGESTION:
+    cmd: python src/stage_01_data_ingestion.py
+    deps:
+      - src/stage_01_data_ingestion.py
+      - src/utils/common.py
+      - src/data_processing/data_validation.py
+      - src/data_processing/data_transformation.py
+      - src/data_processing/load_data.py
+      - configs/config.py
+    outs:
+      - artifacts/sql_data_dir/Insurance_fraud_good_data_db_training.db
+      - artifacts/sql_data_dir/Training_FileFromDB/ModelTrainingInputFile.csv
+
+  DATA_PROCESSING:
+    cmd: python src/stage_02_data_processing.py
+    deps:
+      - src/stage_02_data_processing.py
+      - src/utils/common.py
+      - configs/config.py
+      - artifacts/sql_data_dir/Insurance_fraud_good_data_db_training.db
+      - artifacts/sql_data_dir/Training_FileFromDB/ModelTrainingInputFile.csv
+    outs:
+      - artifacts/data/training_data/*.csv
+
+# Other stages...
+

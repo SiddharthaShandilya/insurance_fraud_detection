@@ -12,7 +12,7 @@ LIST_OF_REQUIREMENTS = []
 
 setup(
     name=SRC_REPO,
-    version="0.0.1",
+    version="0.1.1",
     author=AUTHOR_USER_NAME,
     description="A small package for DVC",
     long_description=long_description,
@@ -22,5 +22,5 @@ setup(
     packages=[SRC_REPO],
     license="MIT",
     python_requires=">=3.6",
-    install_requires=LIST_OF_REQUIREMENTS
+    install_requires=LIST_OF_REQUIREMENTS,
 )
