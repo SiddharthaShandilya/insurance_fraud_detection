@@ -130,12 +130,12 @@ def save_to_csv(dataframe, file_path):
         return True
     except IOError as ioe:
         logging.info(
-            f"An error occurred while saving the data to CSV file: {file_path}"
+            f"An error occurred while saving the data to CSV file: {file_path}: {ioe}"
         )
-        raise Exception(ioe)
+        raise IOError
     except Exception as e:
         logging.info(f"Errro occured while saving the data to csv file {file_path}")
-        raise Exception(e)
+        raise Exception(f"An error occurred while saving data to CSV: {e}")
 
 
 def generate_unique_name(first_name, extension):

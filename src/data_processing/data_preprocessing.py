@@ -49,7 +49,7 @@ class RawDataPreProcessing:
         except FileNotFoundError as e:
             logging.info(f"Dropping Columns failed because::{e}")
             # log_file.write("Current Date :: %s" %date +"\t" +"Current time:: %s" % current_time + "\t \t" + "Data Transformation failed because:: %s" % e + "\n")
-            raise Exception(e)
+            raise FileNotFoundError()
 
     def imputing_empty_values_in_columns(
         self, columns_to_impute: List[str], data: pd.DataFrame
@@ -83,7 +83,9 @@ class RawDataPreProcessing:
             return data
         except Exception as e:
             logging.info(f"Dropping Columns failed because::{e}")
-            raise Exception
+            raise Exception(
+                "An error occurred while imputing empty values in columns"
+            ) from e
 
     def mapping_and_encoding_categorical_columns(
         self, mapping_config, data: pd.DataFrame
@@ -129,5 +131,3 @@ class RawDataPreProcessing:
             raise Exception(
                 "An error occurred while mapping categorical columns."
             ) from e
-
-        return mapped_df
