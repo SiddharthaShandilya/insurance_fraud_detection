@@ -7,10 +7,10 @@ stages:
       - src/data_processing/data_validation.py
       - src/data_processing/data_transformation.py
       - src/data_processing/load_data.py
-      - src/db_operation/db_operations.py
       - configs/config.py
     outs:
-      - artifacts/sql_data_dir/Insurance_fraud_validated_data_db.db
+      - artifacts/sql_data_dir/Insurance_fraud_good_data_db_training.db
+      - artifacts/sql_data_dir/Training_FileFromDB/ModelTrainingInputFile.csv
 
   DATA_PROCESSING:
     cmd: python src/stage_02_data_processing.py
@@ -18,12 +18,10 @@ stages:
       - src/stage_02_data_processing.py
       - src/utils/common.py
       - configs/config.py
-      - src/data_processing/data_preprocessing.py
-      - src/db_operation/db_operations.py
-      - artifacts/sql_data_dir/Insurance_fraud_validated_data_db.db
+      - artifacts/sql_data_dir/Insurance_fraud_good_data_db_training.db
+      - artifacts/sql_data_dir/Training_FileFromDB/ModelTrainingInputFile.csv
     outs:
-      - artifacts/local_data_dir/valid_data/model_training_validated_data_file.csv
-      - artifacts/local_data_dir/processed_data/
+      - artifacts/data/training_data/*.csv
 
 # Other stages...
 

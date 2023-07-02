@@ -9,6 +9,8 @@ import shutil, sqlite3, csv
 from datetime import datetime
 
 
+
+
 def read_yaml(path_to_yaml: str) -> dict:
     """
     Reads Yaml at the given path.
@@ -22,6 +24,7 @@ def read_yaml(path_to_yaml: str) -> dict:
         content = yaml.safe_load(yaml_file)
     logging.info(f"yaml file: {path_to_yaml} loaded successfully")
     return content
+
 
 
 def create_directories(path_to_directories: list) -> None:
@@ -128,14 +131,9 @@ def save_to_csv(dataframe, file_path):
     try:
         dataframe.to_csv(file_path, index=False)
         return True
-    except IOError as ioe:
-        logging.info(
-            f"An error occurred while saving the data to CSV file: {file_path}"
-        )
-        raise Exception(ioe)
-    except Exception as e:
-        logging.info(f"Errro occured while saving the data to csv file {file_path}")
-        raise Exception(e)
+    except IOError:
+        print(f"An error occurred while saving the data to CSV file: {file_path}")
+        return False
 
 
 def generate_unique_name(first_name, extension):
@@ -166,18 +164,3 @@ def generate_unique_name(first_name, extension):
             f"An error occurred while generating the unique filename: {str(e)}"
         )
         raise NameError
-
-
-def read_json_file(file_path):
-    """
-    Reads a JSON file and returns its data in dictionary format.
-
-    Args:
-        file_path (str): The path to the JSON file.
-
-    Returns:
-        dict: The data from the JSON file as a dictionary.
-    """
-    with open(file_path, "r") as file:
-        data = json.load(file)
-    return data
