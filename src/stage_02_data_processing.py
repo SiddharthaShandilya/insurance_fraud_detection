@@ -4,17 +4,16 @@ import shutil
 from tqdm import tqdm
 import logging
 from src.utils.common import (
-    read_yaml,
     create_directories,
     save_to_csv,
-    generate_unique_name,
 )
 import random
 from src.data_processing.data_preprocessing import RawDataPreProcessing
+from src.db_operation.db_operations import DbOperations
 from configs.config import *
 import pandas as pd
 
-STAGE = "STAGE_NAME"  ## <<< change stage name
+STAGE = "stage_02_data_processing"  ## <<< change stage name
 
 logging.basicConfig(
     filename=os.path.join("logs", "running_logs.log"),
@@ -26,45 +25,87 @@ logging.basicConfig(
 
 def main():
     ## read congfig files
-    validated_and_transformed_data_file_path = os.path.join(
+    database_name = ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_DATABASE_NAME"]
+    validated_data_raw_table_name = ARTIFACTS["DATABASE_DIR"][
+        "SQL_TRAINING_VALIDATED_DATA_TABLE_NAME"
+    ]
+    validated_data_dir_path = os.path.join(
         ARTIFACTS["ARTIFACTS_DIR"],
-        ARTIFACTS["DATABASE_DIR"]["SQL_DATABASE_DIR"],
-        ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_FILE_DIR"],
-        ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_FILE_NAME"],
+        ARTIFACTS["LOCAL_DATA_DIR"]["LOCAL_DATA_DIR_NAME"],
+        ARTIFACTS["LOCAL_DATA_DIR"]["VALIDATED_DATA_DIR"],
     )
-    final_data_dir_path_for_model_training = os.path.join(
+    validated_data_file_name = ARTIFACTS["LOCAL_DATA_DIR"]["VALIDATED_DATA_FILE_NAME"]
+    # fetching values for processed data directory
+    processed_data_raw_table_name = ARTIFACTS["DATABASE_DIR"][
+        "SQL_TRAINING_PROCESSED_DATA_TABLE_NAME"
+    ]
+    processed_data_dir_path = os.path.join(
         ARTIFACTS["ARTIFACTS_DIR"],
-        ARTIFACTS["DATABASE_DIR"]["DATABASE"],
-        ARTIFACTS["DATABASE_DIR"]["FINAL_EDA_DATA_DIR"],
+        ARTIFACTS["LOCAL_DATA_DIR"]["LOCAL_DATA_DIR_NAME"],
+        ARTIFACTS["LOCAL_DATA_DIR"]["PROCESSED_DATA_DIR"],
+    )
+    processed_data_file_name = ARTIFACTS["LOCAL_DATA_DIR"]["PROCESSED_DATA_FILE_NAME"]
+    validated_and_transformed_data_file_path = os.path.join(
+        validated_data_dir_path, validated_data_file_name
+    )
+    processed_data_file_path = os.path.join(
+        processed_data_dir_path, processed_data_file_name
+    )
+    db_ops = DbOperations()
+    logging.info("Extracting csv file from table")
+    # export data in table to csvfile
+    db_ops.selecting_data_from_table_into_csv(
+        database=database_name,
+        table_name=validated_data_raw_table_name,
+        data_file_dir_name=validated_data_dir_path,
+        file_name=validated_data_file_name,
     )
     initial_data_frame = pd.read_csv(validated_and_transformed_data_file_path)
 
     data_processing = RawDataPreProcessing(validated_and_transformed_data_file_path)
     # dropping unneccessary columns
-    data_with_dropped_columns = data_processing.drop_unnecessary_columns(
+    data_with_dropped_columns: pd.DataFrame = data_processing.drop_unnecessary_columns(
         columns_to_drop=COLUMNS_TO_IGNORE_FOR_MODEL_TRAINING, data=initial_data_frame
     )
     # imputing categorical columns
-    imputed_data = data_processing.imputing_empty_values_in_columns(
-        columns_to_impute=COLUMNS_TO_IMPUTE_FOR_MODEL_TRAINING,
+    columns_to_impute = [
+        column
+        for column in data_with_dropped_columns.columns
+        if data_with_dropped_columns[column].isnull().any()
+    ]
+    imputed_data: pd.DataFrame = data_processing.imputing_empty_values_in_columns(
+        columns_to_impute=columns_to_impute,
         data=data_with_dropped_columns,
     )
     # mapping and encoding the categorical columns
-    mapped_encoded_data_frame = (
+    mapped_encoded_data_frame: pd.DataFrame = (
         data_processing.mapping_and_encoding_categorical_columns(
             mapping_config=MAPPING_CATEGORICAL_COLUMNS,
             data=imputed_data,
-            columns_to_encode=COLUMNS_TO_ENCODE_FOR_MODEL_TRAINING,
         )
     )
     # performing some more EDA based on graphs
-    final_data_dir_path = final_data_dir_path_for_model_training
-    os.makedirs(final_data_dir_path, exist_ok=True)
-    final_data_file_name = generate_unique_name(
-        first_name="final_data_file", extension=".csv"
+    os.makedirs(processed_data_dir_path, exist_ok=True)
+
+    save_to_csv(mapped_encoded_data_frame, file_path=processed_data_file_path)
+    # saving all the processed data in the database
+    column_name_with_data_types = {}
+    for column in mapped_encoded_data_frame.columns:
+        column_name_with_data_types[column] = "Integer"
+    db_ops.create_table_db(
+        database_name=database_name,
+        column_names_with_data_type=column_name_with_data_types,
+        table_name=processed_data_raw_table_name,
     )
-    final_data_file_path = os.path.join(final_data_dir_path, final_data_file_name)
-    save_to_csv(mapped_encoded_data_frame, file_path=final_data_file_path)
+    logging.info("Table creation Completed!!")
+    logging.info("Insertion of Data into Table started!!!!")
+    # insert csv files in the table
+    db_ops.insert_into_table(
+        database_name=database_name,
+        table_name=processed_data_raw_table_name,
+        data_directory_path=processed_data_dir_path,
+    )
+    logging.info("Insertion of Data into Table Completed!!!!")
 
 
 if __name__ == "__main__":
