@@ -84,12 +84,13 @@ def data_transformation():
     logging.info("!!!Raw Data Transformation Completed !!!")
 
 
-def storing_good_data_to_db_and_delete_dir(col_names, good_data_dir):
+def storing_good_data_to_db_and_delete_dir(col_names, validated_data_dir):
     """
     Store good data into the database table by creating the table and inserting data.
 
     Args:
     col_names: A list of column names for the table.
+    validated_data_dir (str): path to store validated data
 
     Returns:
     None
@@ -105,22 +106,32 @@ def storing_good_data_to_db_and_delete_dir(col_names, good_data_dir):
         db_ops = DbOperations()
         raw_data_validation = RawDataValidation(SOURCE_DATA_DIR, VALID_FILE_SCHEMA_PATH)
         database_name = ARTIFACTS["DATABASE_DIR"]["SQL_TRAINING_DATABASE_NAME"]
-        db_ops.create_table_db(database_name=database_name, column_names=col_names)
+        validated_data_raw_table_name = ARTIFACTS["DATABASE_DIR"][
+            "SQL_TRAINING_VALIDATED_DATA_TABLE_NAME"
+        ]
+
+        db_ops.create_table_db(
+            database_name=database_name,
+            column_names_with_data_type=col_names,
+            table_name=validated_data_raw_table_name,
+        )
         logging.info("Table creation Completed!!")
         logging.info("Insertion of Data into Table started!!!!")
         # insert csv files in the table
-        db_ops.insert_into_table_good_data(database=database_name)
+        db_ops.insert_into_table(
+            database_name=database_name,
+            table_name=validated_data_raw_table_name,
+            data_directory_path=validated_data_dir,
+        )
         logging.info("Insertion in Table completed!!!")
-        delete_directory(good_data_dir)
+        delete_directory(validated_data_dir)
         logging.info("Good_Data folder deleted!!!")
         logging.debug("Moving bad files to Archive and deleting Bad_Data folder!!!")
         # Move the bad files to archive folder
         raw_data_validation.move_bad_files_to_archive_bad()
         logging.info("Bad files moved to archive!! Bad folder Deleted!!")
         logging.info("Validation Operation completed!!")
-        logging.info("Extracting csv file from table")
-        # export data in table to csvfile
-        db_ops.selecting_data_from_table_into_csv(database=database_name)
+
     except Exception as e:
         logging.info(e)
         raise e
@@ -130,17 +141,17 @@ def main():
     ## read config files
 
     logging.info("Raw Data Validation Started")
-    good_data_dir = os.path.join(
+    validated_data_dir = os.path.join(
         ARTIFACTS["ARTIFACTS_DIR"],
-        ARTIFACTS["DATABASE_DIR"]["DATABASE"],
-        ARTIFACTS["DATABASE_DIR"]["GOOD_DATA_DIR"],
+        ARTIFACTS["LOCAL_DATA_DIR"]["LOCAL_DATA_DIR_NAME"],
+        ARTIFACTS["LOCAL_DATA_DIR"]["VALIDATED_DATA_DIR"],
     )
 
     valid_data, col_names = data_validation(VALID_FILE_SCHEMA_PATH, SOURCE_DATA_DIR)
     if valid_data:
         # Raw Data Transformation Started
         data_transformation()
-        storing_good_data_to_db_and_delete_dir(col_names, good_data_dir)
+        storing_good_data_to_db_and_delete_dir(col_names, validated_data_dir)
         return 1
 
 

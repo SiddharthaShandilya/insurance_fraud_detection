@@ -20,13 +20,13 @@ class RawDataTransformation:
     def __init__(self):
         self.good_data_dir = os.path.join(
             ARTIFACTS["ARTIFACTS_DIR"],
-            ARTIFACTS["DATABASE_DIR"]["DATABASE"],
-            ARTIFACTS["DATABASE_DIR"]["GOOD_DATA_DIR"],
+            ARTIFACTS["LOCAL_DATA_DIR"]["LOCAL_DATA_DIR_NAME"],
+            ARTIFACTS["LOCAL_DATA_DIR"]["VALIDATED_DATA_DIR"],
         )
         self.bad_data_dir = os.path.join(
             ARTIFACTS["ARTIFACTS_DIR"],
-            ARTIFACTS["DATABASE_DIR"]["DATABASE"],
-            ARTIFACTS["DATABASE_DIR"]["BAD_DATA_DIR"],
+            ARTIFACTS["LOCAL_DATA_DIR"]["LOCAL_DATA_DIR_NAME"],
+            ARTIFACTS["LOCAL_DATA_DIR"]["BAD_DATA_DIR"],
         )
 
     def replace_missing_with_null(self):

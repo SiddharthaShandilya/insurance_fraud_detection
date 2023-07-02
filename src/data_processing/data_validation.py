@@ -23,18 +23,18 @@ class RawDataValidation:
         self.valid_data_schema_path = valid_data_schema_path
         self.good_data_dir = os.path.join(
             ARTIFACTS["ARTIFACTS_DIR"],
-            ARTIFACTS["DATABASE_DIR"]["DATABASE"],
-            ARTIFACTS["DATABASE_DIR"]["GOOD_DATA_DIR"],
+            ARTIFACTS["LOCAL_DATA_DIR"]["LOCAL_DATA_DIR_NAME"],
+            ARTIFACTS["LOCAL_DATA_DIR"]["VALIDATED_DATA_DIR"],
         )
         self.bad_data_dir = os.path.join(
             ARTIFACTS["ARTIFACTS_DIR"],
-            ARTIFACTS["DATABASE_DIR"]["DATABASE"],
-            ARTIFACTS["DATABASE_DIR"]["BAD_DATA_DIR"],
+            ARTIFACTS["LOCAL_DATA_DIR"]["LOCAL_DATA_DIR_NAME"],
+            ARTIFACTS["LOCAL_DATA_DIR"]["BAD_DATA_DIR"],
         )
         self.training_archive_bad_data_dir_path = os.path.join(
             ARTIFACTS["ARTIFACTS_DIR"],
-            ARTIFACTS["DATABASE_DIR"]["DATABASE"],
-            ARTIFACTS["DATABASE_DIR"]["TRAINING_ARCHIVE_BAD_DATA_DIR"],
+            ARTIFACTS["LOCAL_DATA_DIR"]["LOCAL_DATA_DIR_NAME"],
+            ARTIFACTS["LOCAL_DATA_DIR"]["TRAINING_ARCHIVE_BAD_DATA_DIR"],
         )
 
     def get_value_from_schema(self):
@@ -264,7 +264,7 @@ class RawDataValidation:
         Output: None
         On Failure: OSError
 
-        Written By: iNeuron Intelligence
+        Written By: Siddhartha Shandilya
         Version: 1.0
         Revisions: None
 
@@ -287,7 +287,7 @@ class RawDataValidation:
                 files = os.listdir(source)
                 for f in files:
                     if f not in os.listdir(dest):
-                        shutil.move(source + f, dest)
+                        shutil.move(os.path.join(source, f), dest)
                 logging.info("Bad files moved to archive")
                 delete_directory(path=self.bad_data_dir)
                 logging.info("Bad Raw Data Folder Deleted successfully!!")

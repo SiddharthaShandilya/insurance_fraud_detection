@@ -49,12 +49,10 @@ class RawDataPreProcessing:
         except FileNotFoundError as e:
             logging.info(f"Dropping Columns failed because::{e}")
             # log_file.write("Current Date :: %s" %date +"\t" +"Current time:: %s" % current_time + "\t \t" + "Data Transformation failed because:: %s" % e + "\n")
-            raise FileNotFoundError(
-                f"Directory not found: {os.path.dirname(file_path)}"
-            )
+            raise Exception(e)
 
     def imputing_empty_values_in_columns(
-        self, columns_to_impute: List[str], data
+        self, columns_to_impute: List[str], data: pd.DataFrame
     ) -> pd.DataFrame:
         """
         Method Name: imputes categorical columns with missing values columns
@@ -69,24 +67,26 @@ class RawDataPreProcessing:
         try:
             # Get a data for model training in the directory
             logging.info("imputing_empty_values_in_columns function is called")
-            imputer = SimpleImputer(strategy="most_frequent")
-            # data = pd.read_csv(self.file_path_for_eda)
-            # data = np.array(array).reshape(-1, 1)
-            # imputing three columns which
-            for column_name in columns_to_impute:
-                data[f"{column_name}"] = imputer.fit_transform(
-                    np.array(data[f"{column_name}"]).reshape(-1, 1)
+            # replacing all the "?" with nan values
+            data.replace("?", np.nan, inplace=True)
+            # imputing columns
+            for column in columns_to_impute:
+                if data[column].dtype == "object":
+                    imputer = SimpleImputer(strategy="most_frequent")
+                else:
+                    imputer = SimpleImputer(strategy="mean")
+
+                data[f"{column}"] = imputer.fit_transform(
+                    np.array(data[f"{column}"]).reshape(-1, 1)
                 )
-            # status = save_to_csv(dataframe = data, file_path = self.file_path_for_eda )
             logging.info("Sucessfully imputed unnecessary columns !!!")
             return data
         except Exception as e:
             logging.info(f"Dropping Columns failed because::{e}")
-            # logging.info("Current Date :: %s" %date +"\t" +"Current time:: %s" % current_time + "\t \t" + "Data Transformation failed because:: %s" % e + "\n")
             raise Exception
 
     def mapping_and_encoding_categorical_columns(
-        self, mapping_config, data, columns_to_encode
+        self, mapping_config, data: pd.DataFrame
     ) -> pd.DataFrame:
         """
         Map categorical columns in a DataFrame using a configuration dictionary.
@@ -104,20 +104,19 @@ class RawDataPreProcessing:
         mapped_df = (
             data.copy()
         )  # Create a copy of the DataFrame to avoid modifying the original
-
+        cat_df = pd.DataFrame()
+        columns_to_encode = data.select_dtypes(include=["object"]).columns.tolist()
         try:
             for column, mapping in mapping_config.items():
                 mapped_df[column] = mapped_df[column].map(mapping)
             logging.info("Succesfully mapped categorical_columns")
             for col in columns_to_encode:
-                cat_df = pd.get_dummies(
-                    mapped_df, columns=[col], prefix=[col], drop_first=True
-                )
+                encoded_df = pd.get_dummies(mapped_df[col], prefix=col, drop_first=True)
+                cat_df = pd.concat([cat_df, encoded_df], axis=1)
             # getting columns with numerical values
             num_df = data.select_dtypes(include=["int64"]).copy()
             # concatinating both the encode columns and integer columns in to a single dataframe
             final_df = pd.concat([num_df, cat_df], axis=1)
-            # status = save_to_csv(dataframe = final_df, file_path = self.file_path_for_eda )
             logging.info("Succesfully encoded categorical columns function")
             return final_df
 
