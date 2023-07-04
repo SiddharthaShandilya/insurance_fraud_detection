@@ -147,3 +147,4 @@ logs/*
    
 # ignoring any local DB create using sqlite
 *.db 
+logs/running_logs.log
