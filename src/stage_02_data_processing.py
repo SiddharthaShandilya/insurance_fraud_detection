@@ -10,7 +10,8 @@ from src.utils.common import (
 import random
 from src.data_processing.data_preprocessing import RawDataPreProcessing
 from src.db_operation.db_operations import DbOperations
-from configs.config import *
+from configs.config import ARTIFACTS
+from params import *
 import pandas as pd
 
 STAGE = "stage_02_data_processing"  ## <<< change stage name
@@ -84,9 +85,7 @@ def main():
             data=imputed_data,
         )
     )
-    # performing some more EDA based on graphs
     os.makedirs(processed_data_dir_path, exist_ok=True)
-
     save_to_csv(mapped_encoded_data_frame, file_path=processed_data_file_path)
     # saving all the processed data in the database
     column_name_with_data_types = {}

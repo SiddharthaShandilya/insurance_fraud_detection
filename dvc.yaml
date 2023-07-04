@@ -18,12 +18,26 @@ stages:
       - src/stage_02_data_processing.py
       - src/utils/common.py
       - configs/config.py
+      - params.py
       - src/data_processing/data_preprocessing.py
       - src/db_operation/db_operations.py
       - artifacts/sql_data_dir/Insurance_fraud_validated_data_db.db
     outs:
-      - artifacts/local_data_dir/valid_data/model_training_validated_data_file.csv
-      - artifacts/local_data_dir/processed_data/
+      - artifacts/local_data_dir/processed_data/model_training_processed_data_file.csv
 
+  DATA_CLUSTERING:
+    cmd: python src/stage_03_data_clustering.py
+    deps:
+      - src/stage_03_data_clustering.py
+      - src/utils/common.py
+      - configs/config.py
+      - params.py
+      - src/data_processing/data_clustering.py
+      - artifacts/local_data_dir/processed_data/model_training_processed_data_file.csv
+
+    outs:
+      - artifacts/local_data_dir/clustered_data/model_training_clustered_data_file.csv
+      - artifacts/graphs_dir/elbow_plot_cluster.png
+      - artifacts/models/data_clustering_model/k_means_model.h5
 # Other stages...
 
