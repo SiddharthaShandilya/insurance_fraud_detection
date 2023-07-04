@@ -121,5 +121,5 @@ class KMeansClustering:
             data["cluster"] = k_means_model
             logging.info("The cluster value is added to the dataframe")
             return data
-        except Exception as e:
+        except BaseException as e:
             logging.info(f"Exception occured at create_cluster method :{e}")

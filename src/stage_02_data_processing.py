@@ -11,7 +11,7 @@ import random
 from src.data_processing.data_preprocessing import RawDataPreProcessing
 from src.db_operation.db_operations import DbOperations
 from configs.config import ARTIFACTS
-from params import *
+from params import MAPPING_CATEGORICAL_COLUMNS, COLUMNS_TO_IGNORE_FOR_MODEL_TRAINING
 import pandas as pd
 
 STAGE = "stage_02_data_processing"  ## <<< change stage name
