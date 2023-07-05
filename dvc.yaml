@@ -11,6 +11,8 @@ stages:
       - configs/config.py
     outs:
       - artifacts/sql_data_dir/Insurance_fraud_validated_data_db.db
+      - artifacts/local_data_dir/valid_data/model_training_validated_data_file.csv
+      - artifacts/local_data_dir/Training_archive_bad_data
 
   DATA_PROCESSING:
     cmd: python src/stage_02_data_processing.py
