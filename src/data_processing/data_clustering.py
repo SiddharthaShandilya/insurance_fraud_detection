@@ -95,7 +95,8 @@ class KMeansClustering:
             logging.info(
                 "Finding the number of clusters failed. Exited the elbow_plot method of the KMeansClustering class"
             )
-            raise Exception()
+            raise IOError()
+
 
     def create_cluster(self, data: pd.DataFrame, number_of_cluster: int) -> None:
         """
@@ -121,5 +122,8 @@ class KMeansClustering:
             data["cluster"] = k_means_model
             logging.info("The cluster value is added to the dataframe")
             return data
-        except BaseException as e:
+        except KeyError as e:
             logging.info(f"Exception occured at create_cluster method :{e}")
+        except IOError as ioe:
+            logging.info(f"Exception occured at while creating directory :{ioe}")
+
