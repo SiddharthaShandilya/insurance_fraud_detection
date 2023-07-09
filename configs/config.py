@@ -26,24 +26,12 @@ ARTIFACTS = {
     },
     "CLUSTER_DIR": {"CLUSTER_DIR_NAME": "cluster_data_dir"},
     "MODEL_DIR": {
-        "MODEL_DIR_NAME": "models",
+        "MODEL_DIR_NAME": "model_dir",
         "DATA_CLUSTERING_MODEL_DIR_NAME": "data_clustering_model",
         "DATA_CLUSTERING_MODEL_NAME": "k_means_model.h5",
-        "TRAINED_MODEL_DIR": "model",
-        "BASE_MODEL_DIR": "base_model",
-        "BASE_MODEL_NAME": "base_model.h5",
-        "UPDATED_BASE_MODEL_NAME": "updated_base_model.h5",
+        "TRAINED_MODEL_DIR": "prediction_model_dir",
     },
 }
-ML_LOG_DIR = (
-    {
-        "CHECKPOINT_DIR": "checkpoints",
-        "BASE_LOG_DIR": "base_model_dir",
-        "TENSORBOARD_ROOT_LOG_DIR": "tensorboard_log_dir",
-        "CALLBACKS_DIR": "callbacks",
-    },
-)
-
 
 SOURCE_DATA_DIR = "../outside_data/insurance_fraud_data"  #
 LOCAL_DATA_DIR = "../insurance_fraud_detection/artifacts/data"

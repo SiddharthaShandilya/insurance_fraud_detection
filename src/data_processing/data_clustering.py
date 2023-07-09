@@ -97,8 +97,12 @@ class KMeansClustering:
             )
             raise IOError()
 
-
-    def create_cluster(self, data: pd.DataFrame, number_of_cluster: int) -> None:
+    def create_cluster(
+        self,
+        data: pd.DataFrame,
+        number_of_cluster: int,
+        cluster_column_name: str = "cluster",
+        ) -> None:
         """
         This function will create a kmeans model that will seperate the data into respective cluster
         """
@@ -119,7 +123,7 @@ class KMeansClustering:
             logging.info("Successfully saved the data clustering model")
 
             k_means_model = k_means.fit_predict(data)
-            data["cluster"] = k_means_model
+            data[cluster_column_name] = k_means_model
             logging.info("The cluster value is added to the dataframe")
             return data
         except KeyError as e:

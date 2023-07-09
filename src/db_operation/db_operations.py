@@ -235,8 +235,9 @@ class DbOperations:
             # Add the headers and data to the CSV file.
             csv_file.writerow(headers)
             csv_file.writerows(results)
-
+            conn.close()
             logging.info("File exported successfully!!!")
 
         except Exception as e:
             logging.info(f"File exporting failed. Error : {e}")
+            conn.close()
