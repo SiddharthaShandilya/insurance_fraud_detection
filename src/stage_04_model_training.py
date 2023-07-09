@@ -56,7 +56,6 @@ def main():
             feature, label, test_size=0.33, random_state=42
         )
         # scaling the data fields
-        # TODO: might need to put specific fields to scale later
         feature_train_scaled = RawDataPreProcessing.scale_numerical_columns(
             data=feature_train, columns_for_scaling=LIST_OF_COLUMNS_FOR_SCALING
         )
