@@ -17,6 +17,7 @@ stages:
   DATA_PROCESSING:
     cmd: python src/stage_02_data_processing.py
     deps:
+      - artifacts/local_data_dir/valid_data/model_training_validated_data_file.csv
       - src/stage_02_data_processing.py
       - src/utils/common.py
       - configs/config.py
@@ -40,6 +41,20 @@ stages:
     outs:
       - artifacts/local_data_dir/clustered_data/model_training_clustered_data_file.csv
       - artifacts/graphs_dir/elbow_plot_cluster.png
-      - artifacts/models/data_clustering_model/k_means_model.h5
+      - artifacts/model_dir/data_clustering_model/k_means_model.h5
 # Other stages...
+
+  MODEL_TRAINING:
+    cmd: python src/stage_04_model_training.py
+    deps:
+      - src/stage_03_data_clustering.py
+      - src/stage_04_model_training.py
+      - src/utils/common.py
+      - configs/config.py
+      - params.py
+      - src/model_training/model_training.py
+      - artifacts/local_data_dir/clustered_data/model_training_clustered_data_file.csv
+
+    outs:
+      - artifacts/model_dir/prediction_model_dir/
 

@@ -4,6 +4,7 @@ from src.utils.common import read_yaml, create_directories, save_to_csv
 from params import COLUMNS_WITH_STRING_DATATYPE
 import pandas as pd
 from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
 from typing import List
 import numpy as np
 
@@ -131,3 +132,27 @@ class RawDataPreProcessing:
             raise Exception(
                 "An error occurred while mapping categorical columns."
             ) from e
+
+    @staticmethod
+    def scale_numerical_columns(
+        data: pd.DataFrame, columns_for_scaling: List[str]
+    ) -> pd.DataFrame:
+        """
+        Method Name: standerize_columns
+        Description: This method puts column in a standard form i.e puts it in similar range as other data columns to decrease chances of bias
+
+        Written By: Siddhartha Shandilya
+        Version: 1.0
+        Revisions: None
+        """
+        logging.info("standerize_columns function is called")
+        scaler = StandardScaler()
+        num_df = data[columns_for_scaling]
+        scaled_data = scaler.fit_transform(num_df)
+        scaled_num_df = pd.DataFrame(
+            data=scaled_data, columns=num_df.columns, index=data.index
+        )
+        data.drop(columns=scaled_num_df.columns, inplace=True)
+        data = pd.concat([scaled_num_df, data], axis=1)
+        logging.info("Data is successfully scaled")
+        return scaled_data

@@ -1,5 +1,24 @@
+import numpy as np
+
 # This contains params to be used by the stages to train or predict
 INPUT_FILE_NAME_REGEX = "['fraudDetection']+['\_'']+[\d_]+[\d]+\.csv"
+TARGET_COLUMN_NAME = "fraud_reported_1"  # after one hot encoding the value column name chnage to fraud_reported_1
+CLUSTER_COLUMN_NAME = "cluster"
+# list of columns where scaling is needed
+LIST_OF_COLUMNS_FOR_SCALING = [
+    "months_as_customer",
+    "policy_deductable",
+    "umbrella_limit",
+    "capital-gains",
+    "capital-loss",
+    "incident_hour_of_the_day",
+    "number_of_vehicles_involved",
+    "bodily_injuries",
+    "witnesses",
+    "injury_claim",
+    "property_claim",
+    "vehicle_claim",
+]
 # list of columns with string datatype variables [ DATA TRANSFORMATION  ]
 COLUMNS_WITH_STRING_DATATYPE = [
     "policy_bind_date",
@@ -42,20 +61,7 @@ COLUMNS_TO_IGNORE_FOR_MODEL_TRAINING = [
     "age",
     "total_claim_amount",
 ]
-COLUMNS_TO_IMPUTE_FOR_MODEL_TRAINING = [
-    "collision_type",
-    "property_damage",
-    "police_report_available",
-]
-COLUMNS_TO_ENCODE_FOR_MODEL_TRAINING = [
-    "policy_csl",
-    "insured_education_level",
-    "incident_severity",
-    "insured_sex",
-    "property_damage",
-    "police_report_available",
-    "fraud_reported",
-]
+
 
 MAPPING_CATEGORICAL_COLUMNS = {
     "policy_csl": {"100/300": 1, "250/500": 2.5, "500/1000": 5},
@@ -80,4 +86,19 @@ MAPPING_CATEGORICAL_COLUMNS = {
     "fraud_reported": {"N": 0, "Y": 1},
 }
 
-COLUMN_NAME_FOR_PREDICTION = "fraud_reported_1" # after one hot encoding the value column name chnage to fraud_reported_1
+# PARAMS FOR HYPER_PARAMETER_TUNING
+
+XGBOOST_PARAMS = {
+    "max_depth": [3, 5, 6, 10, 15, 20],
+    "learning_rate": [0.01, 0.1, 0.2, 0.3, 0.4, 0.5],
+    "subsample": np.arange(0.5, 1.0, 0.1),
+    "colsample_bytree": np.arange(0.4, 1.0, 0.1),
+    "colsample_bylevel": np.arange(0.4, 1.0, 0.1),
+    "n_estimators": [100, 500, 700, 900, 1200],
+}
+
+SVM_PARAMS = {
+    "kernel": ["rbf", "sigmoid"],
+    "C": [0.1, 0.5, 1.0],
+    "random_state": [0, 100, 200, 300],
+}

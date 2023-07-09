@@ -4,12 +4,14 @@ dvc
 pandas
 numpy
 PyYAML
-scikit-learn
 flask
 shutils
 black # for simple code formatting
 sklearn-pandas
 matplotlib
 kneed
+# packages for model training
+xgboost
+scikit-learn
 ### local packages -
 -e . # << uncomment this to install from setup.py

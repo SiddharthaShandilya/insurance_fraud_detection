@@ -7,7 +7,7 @@ from src.utils.common import read_yaml, create_directories, save_to_csv
 import random
 from src.data_processing.data_clustering import KMeansClustering
 from configs.config import ARTIFACTS
-from params import COLUMN_NAME_FOR_PREDICTION
+from params import TARGET_COLUMN_NAME, CLUSTER_COLUMN_NAME
 import pandas as pd
 
 
@@ -43,13 +43,15 @@ def main():
     )
     logging.info(f"Fetching data from the csv file at {preocessed_data_file_path}")
     data: pd.DataFrame = pd.read_csv(preocessed_data_file_path)
-    Y: pd.DataFrame = data[COLUMN_NAME_FOR_PREDICTION]
-    X: pd.DataFrame = data.drop(COLUMN_NAME_FOR_PREDICTION, axis=1)
+    Y: pd.DataFrame = data[TARGET_COLUMN_NAME]
+    X: pd.DataFrame = data.drop(TARGET_COLUMN_NAME, axis=1)
     total_cluster_count = kmeans_cluster.elbow_graph(data=X)
     data_with_cluster: pd.DataFrame = kmeans_cluster.create_cluster(
-        data=X, number_of_cluster=total_cluster_count
+        data=X,
+        number_of_cluster=total_cluster_count,
+        cluster_column_name=CLUSTER_COLUMN_NAME,
     )
-    data_with_cluster[COLUMN_NAME_FOR_PREDICTION] = Y
+    data_with_cluster[TARGET_COLUMN_NAME] = Y
     create_directories([clustered_data_dir_path])
     save_to_csv(dataframe=data_with_cluster, file_path=clustered_data_file_path)
 
