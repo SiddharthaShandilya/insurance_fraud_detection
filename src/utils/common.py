@@ -178,3 +178,34 @@ def read_json_file(file_path):
     with open(file_path, "r") as file:
         data = json.load(file)
     return data
+
+
+def combine_csv_files(directory_path: str, output_file_path: str) -> None:
+    """
+    Combines all the CSV files in a directory into a single file.
+
+    Args:
+        directory_path (str): Path to the directory containing the CSV files.
+        output_file_path (str): Name of the output file.
+
+    Returns:
+        None. The combined CSV file is saved in the current directory.
+
+    """
+    logging.info(
+        f"combine_csv_files function is called for merging files at {directory_path}"
+    )
+    combined_data = pd.DataFrame()
+
+    # Iterate over all files in the directory
+    for file_name in os.listdir(directory_path):
+        if file_name.endswith(".csv"):
+            file_path = os.path.join(directory_path, file_name)
+            # Read each CSV file into a DataFrame
+            df = pd.read_csv(file_path)
+            # Append the data to the combined DataFrame
+            combined_data = combined_data.append(df, ignore_index=True)
+
+    # Save the combined DataFrame to a new CSV file
+    combined_data.to_csv(output_file_path, index=False)
+    logging.info(f"Combined CSV files saved as {output_file_path}")

@@ -1,6 +1,9 @@
 stages:
   DATA_INGESTION:
     cmd: python src/stage_01_data_ingestion.py
+    params:
+      - params.py:
+        - INPUT_FILE_NAME_REGEX
     deps:
       - src/stage_01_data_ingestion.py
       - src/utils/common.py
@@ -11,17 +14,19 @@ stages:
       - configs/config.py
     outs:
       - artifacts/sql_data_dir/Insurance_fraud_validated_data_db.db
-      - artifacts/local_data_dir/valid_data/model_training_validated_data_file.csv
+      # - artifacts/local_data_dir/valid_data/model_training_validated_data_file.csv
       - artifacts/local_data_dir/Training_archive_bad_data
 
   DATA_PROCESSING:
     cmd: python src/stage_02_data_processing.py
+    params:
+      - params.py:
+        - MAPPING_CATEGORICAL_COLUMNS
+        - COLUMNS_TO_IGNORE_FOR_MODEL_TRAINING
     deps:
-      - artifacts/local_data_dir/valid_data/model_training_validated_data_file.csv
       - src/stage_02_data_processing.py
       - src/utils/common.py
       - configs/config.py
-      - params.py
       - src/data_processing/data_preprocessing.py
       - src/db_operation/db_operations.py
       - artifacts/sql_data_dir/Insurance_fraud_validated_data_db.db
@@ -30,11 +35,14 @@ stages:
 
   DATA_CLUSTERING:
     cmd: python src/stage_03_data_clustering.py
+    params:
+      - params.py:
+        - TARGET_COLUMN_NAME
+        - CLUSTER_COLUMN_NAME
     deps:
       - src/stage_03_data_clustering.py
       - src/utils/common.py
       - configs/config.py
-      - params.py
       - src/data_processing/data_clustering.py
       - artifacts/local_data_dir/processed_data/model_training_processed_data_file.csv
 
@@ -46,12 +54,15 @@ stages:
 
   MODEL_TRAINING:
     cmd: python src/stage_04_model_training.py
+    params:
+      - params.py:
+        - XGBOOST_HYPER_PARAMS
+        - SVM_HYPER_PARAMS
     deps:
       - src/stage_03_data_clustering.py
       - src/stage_04_model_training.py
       - src/utils/common.py
       - configs/config.py
-      - params.py
       - src/model_training/model_training.py
       - artifacts/local_data_dir/clustered_data/model_training_clustered_data_file.csv
 

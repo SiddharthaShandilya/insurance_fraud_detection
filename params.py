@@ -88,17 +88,17 @@ MAPPING_CATEGORICAL_COLUMNS = {
 
 # PARAMS FOR HYPER_PARAMETER_TUNING
 
-XGBOOST_PARAMS = {
-    "max_depth": [3, 5, 6, 10, 15, 20],
-    "learning_rate": [0.01, 0.1, 0.2, 0.3, 0.4, 0.5],
-    "subsample": np.arange(0.5, 1.0, 0.1),
-    "colsample_bytree": np.arange(0.4, 1.0, 0.1),
-    "colsample_bylevel": np.arange(0.4, 1.0, 0.1),
-    "n_estimators": [100, 500, 700, 900, 1200],
-}
-
-SVM_PARAMS = {
+SVM_HYPER_PARAMS = {
     "kernel": ["rbf", "sigmoid"],
     "C": [0.1, 0.5, 1.0],
     "random_state": [0, 100, 200, 300],
+}
+
+XGBOOST_HYPER_PARAMS = {
+    "max_depth": [3, 5, 6, 10, 15, 20],
+    "learning_rate": [0.01, 0.1, 0.2, 0.3, 0.4, 0.5],
+    "subsample": [0.5, 0.6, 0.7, 0.8, 0.9],
+    "colsample_bytree": [0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+    "colsample_bylevel": [0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+    "n_estimators": [100, 200, 300, 400, 450, 500, 540, 580, 600],
 }
