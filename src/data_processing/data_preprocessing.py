@@ -27,7 +27,7 @@ class RawDataPreProcessing:
         self.file_path_for_eda = file_path_for_eda
 
     def drop_unnecessary_columns(
-        self, columns_to_drop: List[str], data
+        self, columns_to_drop: List[str], data: pd.DataFrame
     ) -> pd.DataFrame:
         """
         Method Name: drop_unnecessary_columns

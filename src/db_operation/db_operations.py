@@ -120,7 +120,7 @@ class DbOperations:
                         )
 
                 conn.close()
-                logging.info("{table_name} table created successfully!!")
+                logging.info(f"{table_name} table created successfully!!")
                 logging.info(f"Closed {database_name} database successfully")
 
         except Exception as e:

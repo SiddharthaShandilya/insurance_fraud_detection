@@ -1,6 +1,5 @@
 ### dependency
 tqdm
-dvc
 pandas
 numpy
 PyYAML
@@ -10,6 +9,9 @@ black # for simple code formatting
 sklearn-pandas
 matplotlib
 kneed
+# data and model versioning
+dvc
+mlflow
 # packages for model training
 xgboost
 scikit-learn

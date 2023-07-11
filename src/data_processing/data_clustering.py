@@ -102,7 +102,7 @@ class KMeansClustering:
         data: pd.DataFrame,
         number_of_cluster: int,
         cluster_column_name: str = "cluster",
-        ) -> None:
+    ) -> None:
         """
         This function will create a kmeans model that will seperate the data into respective cluster
         """
@@ -130,4 +130,3 @@ class KMeansClustering:
             logging.info(f"Exception occured at create_cluster method :{e}")
         except IOError as ioe:
             logging.info(f"Exception occured at while creating directory :{ioe}")
-

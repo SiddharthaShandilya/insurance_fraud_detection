@@ -36,17 +36,24 @@ def main():
         ARTIFACTS["MODEL_DIR"]["MODEL_DIR_NAME"],
         ARTIFACTS["MODEL_DIR"]["TRAINED_MODEL_DIR"],
     )
-    create_directories([model_dir_path])
     model_training_cls = ModelTraining()
     # reading the data file with clustered columns
-    clustered_data = pd.read_csv(clusterd_data_file_path)
-
-    for values in clustered_data[CLUSTER_COLUMN_NAME].unique():
+    combined_clustered_data = pd.read_csv(clusterd_data_file_path)
+    logging.info(
+        f" total number of cluster present {combined_clustered_data[CLUSTER_COLUMN_NAME].unique()}"
+    )
+    logging.info(
+        f"Picking all the columns of cluster {values}\n Total data points {combined_clustered_data.shape}"
+    )
+    for values in combined_clustered_data[CLUSTER_COLUMN_NAME].unique():
         logging.info(f"Model training started for cluster {values}")
         # seperating the values for one cluster
-        clustered_data: pd.DataFrame = clustered_data[
-            clustered_data[CLUSTER_COLUMN_NAME] == values
+        clustered_data: pd.DataFrame = combined_clustered_data.loc[
+            combined_clustered_data[CLUSTER_COLUMN_NAME] == values
         ]
+        logging.info(
+            f"Picking all the columns of cluster {values}\n Total data points {clustered_data.shape}"
+        )
         label = clustered_data[TARGET_COLUMN_NAME]
         feature = clustered_data.drop(
             [TARGET_COLUMN_NAME, CLUSTER_COLUMN_NAME], axis=1
@@ -65,6 +72,9 @@ def main():
         best_model_name, best_model = model_training_cls.calculate_best_model(
             feature_train_scaled, feature_test_scaled, target_train, target_test
         )
+        # creatin gthe directry before saving the model
+        model_cluster_dirpath = os.path.join(model_dir_path, f"model_cluster_{values}")
+        create_directories([model_cluster_dirpath])
         trained_model_filename = os.path.join(
             model_dir_path, f"model_cluster_{values}", f"{best_model_name}.h5"
         )

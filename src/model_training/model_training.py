@@ -4,7 +4,7 @@ import xgboost as xgb
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, roc_auc_score
-from params import XGBOOST_PARAMS, SVM_PARAMS
+from params import XGBOOST_HYPER_PARAMS, SVM_HYPER_PARAMS
 import logging
 
 
@@ -31,9 +31,9 @@ class ModelTraining:
         xgbr = xgb.XGBRegressor(seed=20)
         best_xgb_model = RandomizedSearchCV(
             estimator=xgbr,
-            param_distributions=XGBOOST_PARAMS,
+            param_distributions=XGBOOST_HYPER_PARAMS,
             scoring="neg_mean_squared_error",
-            n_iter=85,
+            n_iter=200,
             verbose=1,
         )
         best_xgb_model.fit(fetaure_columns, target_columns)
@@ -61,9 +61,9 @@ class ModelTraining:
         xgbr = xgb.XGBRegressor(seed=20)
         best_svm_model = RandomizedSearchCV(
             estimator=xgbr,
-            param_distributions=SVM_PARAMS,
+            param_distributions=SVM_HYPER_PARAMS,
             scoring="neg_mean_squared_error",
-            n_iter=85,
+            n_iter=150,
             verbose=1,
         )
         best_svm_model.fit(fetaure_columns, target_columns)
