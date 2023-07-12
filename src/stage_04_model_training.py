@@ -43,7 +43,7 @@ def main():
         f" total number of cluster present {combined_clustered_data[CLUSTER_COLUMN_NAME].unique()}"
     )
     logging.info(
-        f"Picking all the columns of cluster {values}\n Total data points {combined_clustered_data.shape}"
+        f"Total data points {combined_clustered_data.shape}"
     )
     for values in combined_clustered_data[CLUSTER_COLUMN_NAME].unique():
         logging.info(f"Model training started for cluster {values}")
@@ -80,7 +80,7 @@ def main():
         )
         joblib.dump(best_model, trained_model_filename)
         logging.info(
-            f"Model {best_model_name} succesfully trained for cluster {values} and stroed at {trained_model_filename}"
+            f"Model {best_model_name} succesfully trained for cluster {values} and stored at {trained_model_filename}"
         )
 
 
