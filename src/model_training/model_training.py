@@ -6,7 +6,7 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, roc_auc_score
 from params import XGBOOST_HYPER_PARAMS, SVM_HYPER_PARAMS
 import logging
-
+import mlflow
 
 class ModelTraining:
     """
@@ -33,12 +33,12 @@ class ModelTraining:
             estimator=xgbr,
             param_distributions=XGBOOST_HYPER_PARAMS,
             scoring="neg_mean_squared_error",
-            n_iter=200,
+            n_iter=50,
             verbose=1,
         )
         best_xgb_model.fit(fetaure_columns, target_columns)
         logging.info(
-            f"Hyper Parameter tuning for XGBoost is called, best params found is {best_xgb_model.best_params_} \n with best score of {best_xgb_model   .best_score_}"
+            f"Hyper Parameter tuning for XGBoost is called, best params found is {best_xgb_model.best_params_} \n with best score of {best_xgb_model.best_score_}"
         )
         return best_xgb_model
 
@@ -63,7 +63,7 @@ class ModelTraining:
             estimator=xgbr,
             param_distributions=SVM_HYPER_PARAMS,
             scoring="neg_mean_squared_error",
-            n_iter=150,
+            n_iter=50,
             verbose=1,
         )
         best_svm_model.fit(fetaure_columns, target_columns)
@@ -87,44 +87,50 @@ class ModelTraining:
         """
         logging.info("calculate_best_model function is called")
         try:
-            xgboost = self.best_params_for_xgboost(feature_train, target_train)
-            prediction_xgboost = xgboost.best_estimator_.predict(
-                feature_test
-            )  # Predictions using the XGBoost Model
+            with mlflow.start_run():
+                xgboost = self.best_params_for_xgboost(feature_train, target_train)
+                mlflow.log_params(xgboost.best_params_)
+                mlflow.log_metric("Best Score for xg_boost on trained data",xgboost.best_score_)
+                prediction_xgboost = xgboost.best_estimator_.predict(
+                    feature_test
+                )  # Predictions using the XGBoost Model
 
-            if (
-                len(target_test.unique()) == 1
-            ):  # if there is only one label in y, then roc_auc_score returns error. We will use accuracy in that case
-                xgboost_score = accuracy_score(target_test, prediction_xgboost)
-                logging.info("Accuracy for XGBoost:" + str(xgboost_score))  # Log AUC
-            else:
-                xgboost_score = roc_auc_score(
-                    target_test, prediction_xgboost
-                )  # AUC for XGBoost
-                logging.info("AUC for XGBoost:" + str(xgboost_score))  # Log AUC
+                if (
+                    len(target_test.unique()) == 1
+                ):  # if there is only one label in y, then roc_auc_score returns error. We will use accuracy in that case
+                    xgboost_score = accuracy_score(target_test, prediction_xgboost)
+                    logging.info("Accuracy for XGBoost:" + str(xgboost_score))  # Log AUC
+                else:
+                    xgboost_score = roc_auc_score(
+                        target_test, prediction_xgboost
+                    )  # AUC for XGBoost
+                    logging.info("AUC for XGBoost:" + str(xgboost_score))  # Log AUC
+                # storign the new score in mlflow
+                mlflow.log_metric("AUC Score for XG_Boost", xgboost_score)
+                ########### create best model for Random Forest ###########
+                svm = self.best_params_for_svm(feature_train, target_train)
+                mlflow.log_params(xgboost.best_params_)
+                mlflow.log_metric("Best Score for SVM on trained data",xgboost.best_score_)
+                prediction_svm = svm.best_estimator_.predict(
+                    feature_test
+                )  # prediction using the SVM Algorithm
 
-            # create best model for Random Forest
-            svm = self.best_params_for_svm(feature_train, target_train)
-            prediction_svm = svm.best_estimator_.predict(
-                feature_test
-            )  # prediction using the SVM Algorithm
-
-            if (
-                len(target_test.unique()) == 1
-            ):  # if there is only one label in y, then roc_auc_score returns error. We will use accuracy in that case
-                svm_score = accuracy_score(target_test, prediction_svm)
-                logging.info("Accuracy for SVM:" + str(svm_score))
-            else:
-                svm_score = roc_auc_score(
-                    target_test, prediction_svm
-                )  # AUC for Random Forest
-                logging.info("AUC for SVM:" + str(svm_score))
-
-            # comparing the two models
-            if svm_score < xgboost_score:
-                return "XGBoost", xgboost.best_estimator_
-            else:
-                return "SVM", svm.best_estimator_
+                if (
+                    len(target_test.unique()) == 1
+                ):  # if there is only one label in y, then roc_auc_score returns error. We will use accuracy in that case
+                    svm_score = accuracy_score(target_test, prediction_svm)
+                    logging.info("Accuracy for SVM:" + str(svm_score))
+                else:
+                    svm_score = roc_auc_score(
+                        target_test, prediction_svm
+                    )  # AUC for Random Forest
+                    logging.info("AUC for SVM:" + str(svm_score))
+                mlflow.log_metric("AUC Score for SVM", svm_score)
+                # comparing the two models
+                if svm_score < xgboost_score:
+                    return "XGBoost", xgboost.best_estimator_
+                else:
+                    return "SVM", svm.best_estimator_
 
         except Exception as e:
             logging.info(
